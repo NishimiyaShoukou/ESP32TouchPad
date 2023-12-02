@@ -5,7 +5,7 @@ hw_timer_t * timer = NULL;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 // Just test touch pin - Touch0 is T0 which is on GPIO 1,T0~T10为GPIO0~10.
 
-#define MAX_NO_TOUCH_VALUE 45000
+#define MAX_NO_TOUCH_VALUE 49000
 #define PAD_SPEED 5
 typedef struct{
     int curXValue[5];
@@ -80,9 +80,10 @@ void loop()
 {
     GetTouchInput();
     TouchProcess();
-   // bleMouse.move(5, 5);
+
     //ReadTchInfo();
 }
+
 
 void TouchInit(void)
 {
@@ -106,6 +107,12 @@ void TouchInit(void)
     
 }
 
+/***************
+ * function: GetTouchInput
+ * descript: 读取电容值
+ * return: 
+ * date: 2023-12-03
+ **************/
 void GetTouchInput(void)
 {
     /* x输入获取 */
@@ -124,6 +131,12 @@ void GetTouchInput(void)
   
 }
 
+/***************
+ * function: ReadTchInfo
+ * descript: 打印读取电容值
+ * return: 
+ * date: 2023-12-03
+ **************/
 void ReadTchInfo(void)
 {
     int i;
@@ -276,7 +289,7 @@ uint8_t GetTouchXPos(void)
 
     int count;
     const int*p = touchInput.curXValue;
-    for(count = 1;count < 5;count++)
+    for(count = 0;count < 5;count++)
     {
       if(*p < touchInput.curXValue[count])
         p = &touchInput.curXValue[count];
@@ -291,7 +304,7 @@ uint8_t GetTouchYPos(void)
 
     int count;
     const int*p = touchInput.curYValue;
-    for(count = 1;count < 5;count++)
+    for(count = 0;count < 5;count++)
     {
       if(*p < touchInput.curYValue[count])
         p = &touchInput.curYValue[count];
@@ -316,6 +329,11 @@ void GetMoveDistance()
     // beginTime = Get_Sys_Time_tick();
     TouchPad.curXPos = GetTouchXPos();
     TouchPad.curYPos = GetTouchYPos();
+    if (TouchPad.lastState == RELEASE)
+    {
+        TouchPad.lastXPos = TouchPad.curXPos;
+        TouchPad.lastYPos = TouchPad.curYPos;        
+    }
 
     // if ((Get_Sys_Time_tick() - beginTime) >= 10)
     // {
@@ -339,17 +357,17 @@ void GetMoveDistance()
             }
             if (y_move >= 0)
             {
-                TouchPad.moveY = 1; 
+                TouchPad.moveY = -1; 
             }
             else
             {
-                TouchPad.moveY = -1; 
+                TouchPad.moveY = 1; 
             }
         }
         else
         {
             TouchPad.moveX = x_move;
-            TouchPad.moveY = y_move;
+            TouchPad.moveY = -y_move;
         }
     } 
 
