@@ -5,7 +5,8 @@ hw_timer_t * timer = NULL;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 // Just test touch pin - Touch0 is T0 which is on GPIO 1,T0~T10为GPIO0~10.
 
-#define MAX_NO_TOUCH_VALUE 40000
+#define MAX_NO_TOUCH_VALUE 45000
+#define PAD_SPEED 5
 typedef struct{
     int curXValue[5];
     int curYValue[5];
@@ -55,7 +56,10 @@ void ARDUINO_ISR_ATTR onTimer()
 {
     portENTER_CRITICAL_ISR(&timerMux);
     if (_touch_evt == ACT_PRESS || _touch_evt ==  ACT_LONG_PRESSING)
+    {
         GetMoveDistance();
+
+    }   
     portEXIT_CRITICAL_ISR(&timerMux);
 }
 
@@ -201,6 +205,7 @@ void TouchProcess(void)
                 {
                     _touch_evt = ACT_SHORT_CLICKED;
                 }
+                CleanTouchPos();              
             break;
             
             case PRESSED:
@@ -238,7 +243,22 @@ void TouchProcess(void)
          break;
      }
     
-
+    if (_touch_evt == ACT_PRESS || _touch_evt ==  ACT_LONG_PRESSING)
+    {
+  
+        if(bleMouse.isConnected())
+        {
+            // Serial.println("x:");
+            // Serial.println(TouchPad.moveX);
+            // Serial.println("y:");
+            // Serial.println(TouchPad.moveY);
+            bleMouse.move(TouchPad.moveX*PAD_SPEED, TouchPad.moveY*PAD_SPEED);
+            
+    //        bleMouse.move(0.5*x, 0.5*y);
+     
+    
+        }
+    }   
    
 }
 
@@ -281,6 +301,14 @@ uint8_t GetTouchYPos(void)
 
 }
 
+void CleanTouchPos(void)
+{
+    TouchPad.curXPos = 0;
+    TouchPad.lastXPos = 0;
+    TouchPad.curYPos = 0;
+    TouchPad.lastYPos = 0;  
+}
+
 void GetMoveDistance()
 {
     static uint32_t beginTime;
@@ -293,9 +321,38 @@ void GetMoveDistance()
     // {
     x_move = TouchPad.curXPos - TouchPad.lastXPos;
     y_move = TouchPad.curYPos - TouchPad.lastYPos;
+    if (x_move > 1 || y_move >= 1)
+    {
+        TouchPad.moveSpeed = 2;
+    }
+    if ((TouchPad.lastXPos != TouchPad.curXPos) || (TouchPad.lastYPos != TouchPad.curYPos))
+    {
+        if (TouchPad.moveSpeed <= 1)
+        {
+            if (x_move >= 0)
+            {
+                TouchPad.moveX = 1; 
+            }
+            else
+            {
+                TouchPad.moveX = -1; 
+            }
+            if (y_move >= 0)
+            {
+                TouchPad.moveY = 1; 
+            }
+            else
+            {
+                TouchPad.moveY = -1; 
+            }
+        }
+        else
+        {
+            TouchPad.moveX = x_move;
+            TouchPad.moveY = y_move;
+        }
+    } 
 
-    TouchPad.moveX = x_move;
-    TouchPad.moveY = y_move;
     TouchPad.lastXPos = TouchPad.curXPos;
     TouchPad.lastYPos = TouchPad.curYPos;
     // beginTime = Get_Sys_Time_tick();
@@ -316,34 +373,13 @@ void touch_evt_proc_press()
 {
     int x, y;
     Serial.println("TouchPad is press!!");
-    if(bleMouse.isConnected())
-    {
-        Serial.println("x:");
-        Serial.println(TouchPad.moveX);
-        Serial.println("y:");
-        Serial.println(TouchPad.moveY);
-        bleMouse.move(TouchPad.moveX*5, TouchPad.moveY*5);
-//        bleMouse.move(0.5*x, 0.5*y);
- 
 
-    }
 }
 
 void touch_evt_proc_long_pressing()
 {
     int x, y;
-    if(bleMouse.isConnected())
-    {
-        Serial.println("x:");
-        Serial.println(TouchPad.moveX);
-        Serial.println("y:");
-        Serial.println(TouchPad.moveY);
-        bleMouse.move(TouchPad.moveX*5, TouchPad.moveY*5);
-        
-//        bleMouse.move(0.5*x, 0.5*y);
- 
 
-    }
     Serial.println("TouchPad is long press!!");
     Serial.print("Press x:");
     Serial.println(GetTouchXPos());
