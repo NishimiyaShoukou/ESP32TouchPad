@@ -10,13 +10,18 @@
 -->
 # <center> ESP32TouchPad   
   
-> &emsp;&emsp;ʹ��ESP32�ĵ��ݴ�����������5x5�ֱ��ʴ�С�Ĵ�����  
+> &emsp;&emsp;使用ESP32的电容触摸引脚制作5x5分辨率大小的触摸板  
 &emsp;&emsp;Make a 5x5 resolution size touchpad using ESP32's capacitive touch pins
-## ��Ŀ���  
-&emsp;&emsp;����ESP32-S3��Ŀǰʹ�ü�PCB���Ƶ�5x5��������ͨ���ֱ��ȡx��y��5·���ݱ仯����ȡ����λ�ã�ͨ������HIDʵ���������ߴ����幦�ܡ�  
+## 项目简介  
+&emsp;&emsp;基于ESP32-S3、目前使用简单PCB绘制的5x5矩形区域，通过分别读取x和y的5路电容变化量获取触摸位置，通过蓝牙HID实现蓝牙无线触摸板功能。  
 
 
-![PCBͼ](./image/PadPcb01.jpg)
+![PCB图](./image/PadPcb01.jpg)
   
 
-&emsp;&emsp;V1.0�汾ԭ��ͼ�ܼ򵥣�ֻ��Ҫ���ߵ�ESP32���������ʹ�á�Ŀǰ���������ںܶ�����
+&emsp;&emsp;V1.0版本原理图很简单，只需要接线到ESP32开发板就能使用、目前软件还存在很多问题
+
+项目使用以下第三方库:  
+project depends on the following packages:  
+
+- [ESP32 BLE Mouse](https://github.com/T-vK/ESP32-BLE-Mouse)
