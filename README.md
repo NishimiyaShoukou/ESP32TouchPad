@@ -21,6 +21,7 @@
 
 &emsp;&emsp;V1.0版本原理图很简单，只需要接线到ESP32开发板就能使用、目前软件还存在很多问题
 
-项目使用以下第三方库:
-project depends on the following packages:
-- [ESP32 BLE Mouse]([https://github.com/T-vK/ESP32-BLE-Mouse])
+项目使用以下第三方库:  
+project depends on the following packages:  
+
+- [ESP32 BLE Mouse](https://github.com/T-vK/ESP32-BLE-Mouse)
